@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Machine Operational Rate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Chart.jsのCDN URLを修正 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+</head>
+<body>
+
+<h1>Machine Operational Rate</h1>
+
+<!-- Adding title attribute to fix accessibility warning -->
+<select id="time_scale" title="Select Time Scale">
+    <option value="hour">Hour</option>
+    <option value="day">Day</option>
+    <option value="month">Month</option>
+</select>
+
+<!-- グラフを表示する要素 -->
+<canvas id="myChart" width="400" height="200"></canvas>
+
+<script>
+console.log("Script is running");  // デバッグ用: スクリプトが実行されているか確認
+
+let myChart;
+let ctx = document.getElementById('myChart').getContext('2d');
+myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Operational Rate (%)',
+            data: [],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100 // as it's a rate in percentage
+            }
+        }
+    }
+});
+
+function updateChart(timeScale) {
+    console.log("Sending GET request with timeScale:", timeScale);  // デバッグ用
+
+    $.get('/occupancy_rate/', {time_scale: timeScale})
+        .done(function(data) {
+            console.log("GET request succeeded:", JSON.stringify(data));  // デバッグ用
+
+            console.log("Before update, labels:", myChart.data.labels);  // デバッグ用
+            console.log("Before update, data:", myChart.data.datasets[0].data);  // デバッグ用
+
+            myChart.data.labels = data.labels;
+            myChart.data.datasets[0].data = data.values;
+            myChart.update();
+
+            console.log("After update, labels:", myChart.data.labels);  // デバッグ用
+            console.log("After update, data:", myChart.data.datasets[0].data);  // デバッグ用
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            console.log("GET request failed:", textStatus, errorThrown);  // デバッグ用
+        });
+}
+
+updateChart('hour');
+
+$(document).ready(function(){
+    $('#time_scale').change(function(){
+        const timeScale = $(this).val();
+        updateChart(timeScale);
+    });
+});
+</script>
+
+</body>
+</html>
