@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'occupancy_rate.apps.OccupancyRateConfig', #プロジェクトにアプリを認識させる
+    'Occcupancy_rate_api.apps.OcccupancyRateApiConfig', #プロジェクトにアプリを認識させる
+    'rest_framework', #追加
 ]
 
 MIDDLEWARE = [

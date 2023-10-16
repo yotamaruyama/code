@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from occupancy_rate.models import MachineData
+from .serializers import MachineDataSerializer  # シリアライザのインポートを確認
 
-# Create your views here.
+class MachineDataViewSet(viewsets.ModelViewSet):
+    queryset = MachineData.objects.all()
+    serializer_class = MachineDataSerializer
