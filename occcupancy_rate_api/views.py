@@ -65,8 +65,8 @@ class SocketCommunicationView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=500)
         
-        return Response({"status": "success"})
+        return Response({"status": "success"})"""
 class MachineDataViewSet(viewsets.ModelViewSet):
     queryset = MachineData.objects.all()
-    serializer_class = MachineDataSerializer"""
+    serializer_class = MachineDataSerializer
 
