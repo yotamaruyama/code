@@ -4,7 +4,6 @@ from datetime import datetime,timedelta,timezone
 from occupancy_rate.models import MachineData
 import pytz
 
-tz = pytz.timezone('Asia/Tokyo')
 first_run = True
 
 def one_minutes_timer():
@@ -44,7 +43,8 @@ def main():
 
     #cnt = 0
     #is_operatinaol = data_change(msg)
-                    
+
+
     while is_first_run:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 新しいソケットを作成
         try:
@@ -52,7 +52,7 @@ def main():
             client_socket.connect((ip,port))
             print("サーバに接続できました。")
             is_first_run = False
-            client_socket.sendall(b"500000FF03FF00001C002004010000D*0000010001")
+            client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000100001"))
             """try :
                 response = client_socket.recv(1024).decode()
             except ConnectionResetError:
@@ -70,13 +70,8 @@ def main():
                 try:
                     #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D210)
                     #D210のレジスタに0xffが格納されているかを、D210の値を読み出して確認
-                    client_socket.sendall(b"500000FF03FF00001C002004010000D*0000010001")
-                    response = client_socket.recv(1024).decode('utf-8')
-                
-                    """print("接続がリセットされました。再接続します...")
-                    client_socket.close()
-                    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    client_socket.connect((ip, port))"""
+                    client_socket.send(bytes(b"500000FF03FF00001C002004010000D*0000100001"))
+                    response = str(client_socket.recv(1024).decode())
                     msg,is_operational = data(response)
                     base_datetime= datetime.now(pytz.timezone('Asia/Tokyo'))
                     base_datetime = base_datetime.strftime("%Y-%m-%d %H:%M:%S")
