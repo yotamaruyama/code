@@ -6,6 +6,7 @@ import pytz
 
 first_run = True
 
+#1分間計測用関数
 def one_minutes_timer():
     global first_run
     if first_run:
@@ -18,6 +19,7 @@ def one_minutes_timer():
             #main()
             break
 
+#PLCのレジスタを型変換して、値を読み取る関数
 def data(response):
     msg = str(response)
     msg = int(msg[-4:])
@@ -25,6 +27,7 @@ def data(response):
     print(f'PLCのレジスタの値: {msg}')
     return msg,is_operational
 
+#PLCのレジスタの値を判定し、True or Falseを返す関数
 def data_change(msg):
     if msg == 1:
         return True
@@ -37,9 +40,6 @@ def main():
     #サーバ(plc)のIPアドレスとポート番号を格納
     ip = "192.168.16.99"
     port = 4096
-    #ip = "192.168.8.114"
-    #port = 1234
-    #is_first_run = True
 
     while True:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 新しいソケットを作成
@@ -49,36 +49,39 @@ def main():
             print("サーバに接続できました。")
             #client_socket.close()  # ソケットを閉じる
             break  # ループを抜ける
-            #is_first_run = False
 
+        # 接続が失敗した場合、再試行する
         except ConnectionRefusedError:
             print("サーバに接続できません。再試行します...")
             client_socket.close()
             time.sleep(3)  # 接続が失敗した場合、一定時間待機してから再試行
     try:
         while True:
-            one_minutes_timer()
+            one_minutes_timer()  # 1分間計測
             try:
-                #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D210)
-                #D210のレジスタに0xffが格納されているかを、D210の値を読み出して確認
+                #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D010)
+                #D010のレジスタに任意の値が格納されているかを、D010の値を読み出して確認
                 client_socket.send(bytes(b"500000FF03FF000018002004010000D*0000100001"))
                 response = str(client_socket.recv(1024).decode())
-                msg,is_operational = data(response)
-                base_datetime= datetime.now(pytz.timezone('Asia/Tokyo'))
-                base_datetime = base_datetime.strftime("%Y-%m-%d %H:%M:%S")
+                msg,is_operational = data(response)      
+                base_datetime= datetime.now(pytz.timezone('Asia/Tokyo'))    #日本時間で取得
+                base_datetime = base_datetime.strftime("%Y-%m-%d %H:%M:%S")   #文字列に変換
                 print(f"取得時刻: {base_datetime}")
                 print(f"サーバからの読み出し応答: {msg}")
-                print(response)
                 timestamp = base_datetime
+
+                #データベースに保存(ここはうまく行っていない)
                 MachineData.objects.create(
                         timestamp=timestamp,
                         is_operational=is_operational
                 )
 
+            # タイムアウトした場合、再試行する
             except TimeoutError:
                 print("タイムアウトしました。再試行します...")
                 time.sleep(3)
-        
+
+    # ソケットを閉じる    
     finally:
         client_socket.close()
         print("ソケットを閉じる")
