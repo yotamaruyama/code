@@ -12,5 +12,5 @@ class OcccupancyRateApiConfig(AppConfig):
 
     def start_socket_communication(self):
         time.sleep(1)
-        from occcupancy_rate_api.socket_code import main  # socket_code.py として保存した関数をインポート
+        from occcupancy_rate_api.models import main  # socket_code.py として保存した関数をインポート
         main()
