@@ -51,7 +51,7 @@ myChart = new Chart(ctx, {
 function updateChart(timeScale) {
     console.log("Sending GET request with timeScale:", timeScale);  // デバッグ用
 
-    $.get('/occupancy_rate/', {time_scale: timeScale})
+    $.get('/occupancy_rate/', {time_scale: timeScale},null,'json')
         .done(function(data) {
             console.log("GET request succeeded:", JSON.stringify(data));  // デバッグ用
 
