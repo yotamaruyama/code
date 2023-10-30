@@ -43,6 +43,8 @@ def data(response):
 def data_change(msg):
     if msg == 1:
         return True
+    elif msg == 2 or msg == 3:
+        return False
     else:
         return False
 
@@ -50,10 +52,10 @@ def data_change(msg):
 def main():
     #ローカル変数
     #サーバ(plc)のIPアドレスとポート番号を格納
-    #ip = "192.168.16.99"
-    #port = 4096
-    ip="192.168.8.55"
-    port=1357
+    ip = "192.168.16.99"
+    port = 4096
+    #ip="192.168.8.55"
+    #port=1357
 
     while True:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 新しいソケットを作成
@@ -76,8 +78,8 @@ def main():
             try:
                 #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D010)
                 #D010のレジスタに任意の値が格納されているかを、D010の値を読み出して確認
-                #client_socket.send(bytes(b"500000FF03FF000018002004010000D*0000100001"))
-                client_socket.send(bytes(b"D202"))
+                client_socket.send(bytes(b"500000FF03FF000018002004010000D*0000100001"))
+                #client_socket.send(bytes(b"D202"))
                 response = str(client_socket.recv(1024).decode())
                 msg,is_operational = data(response)      
                 timestamp= datetime.now()    #日本時間で取得
