@@ -64,18 +64,14 @@ def main():
                 #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D010)
                 #D010のレジスタに任意の値が格納されているかを、D010の値を読み出して確認
                 client_socket.send(bytes(b"500000FF03FF000018002004010000D*0000100001"))
-                #client_socket.send(bytes(b"D202"))
                 response = str(client_socket.recv(1024).decode())
                 msg,is_operational = data(response)      
                 timestamp= datetime.now()    #日本時間で取得
-                #timestamp = timestamp.astimezone(pytz.timezone('Asia/Tokyo'))
                 timestamp = timestamp.replace(tzinfo=None)
                 timestamp = timestamp.replace(microsecond=0)
-                #timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")   #文字列に変換
                 print(f"取得時刻: {timestamp}")
                 print(f"サーバからの読み出し応答: {msg}")
 
-                #データベースに保存(ここはうまく行っていない)
                 MachineData.objects.create(
                         timestamp=timestamp,
                         is_operational=is_operational
