@@ -62,7 +62,7 @@ def main():
             try:
                 #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D010)
                 #D010のレジスタに任意の値が格納されているかを、D010の値を読み出して確認
-                client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000100001"))
+                client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000010001"))
                 response = str(client_socket.recv(1024).decode())
                 msg,is_operational = data(response)      
                 timestamp= datetime.now()    #日本時間で取得
