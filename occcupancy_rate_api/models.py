@@ -1,7 +1,11 @@
 import socket
 import time
-from datetime import datetime
+import pytz
+from datetime import datetime,timezone
+from django.utils import timezone as djtimezone
 from occupancy_rate.models import MachineData
+from django.utils.timezone import localtime 
+from django.utils import timezone
 
 first_run = True
 
@@ -14,7 +18,7 @@ def one_minutes_timer():
     timer1 = time.time()
     while True:
         timer2 = time.time()
-        if timer2 - timer1 >= 60:
+        if timer2 - timer1 >= 10:
             #main()
             break
 
@@ -39,8 +43,12 @@ def data_change(msg):
 def main():
     #ローカル変数
     #サーバ(plc)のIPアドレスとポート番号を格納
-    ip = "192.168.16.99"
-    port = 4096
+    
+    ip="192.168.8.55"
+    port=1357
+    
+    #ip = "192.168.16.99"
+    #port = 4100
 
     while True:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 新しいソケットを作成
@@ -62,10 +70,16 @@ def main():
             try:
                 #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D010)
                 #D010のレジスタに任意の値が格納されているかを、D010の値を読み出して確認
-                client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000010001"))
+                #client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000010001")) 
+                #if  client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000010001")) :
+                client_socket.sendall(b"D202") 
                 response = str(client_socket.recv(1024).decode())
-                msg,is_operational = data(response)      
-                timestamp= datetime.now()    #日本時間で取得
+                msg,is_operational = data(response) 
+                timestamp: datetime = datetime.now(pytz.timezone('Asia/Tokyo'))  
+                #timestamp= localtime(djtimezone.now())
+                #tz = pytz.timezone('Asia/Tokyo')
+                #timestamp = timestamp.astimezone(tz)
+    
                 timestamp = timestamp.replace(tzinfo=None)
                 timestamp = timestamp.replace(microsecond=0)
                 print(f"取得時刻: {timestamp}")
