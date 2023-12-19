@@ -44,11 +44,13 @@ def main():
     #ローカル変数
     #サーバ(plc)のIPアドレスとポート番号を格納
     
-    ip="192.168.8.55"
-    port=1357
-    
-    #ip = "192.168.16.99"
-    #port = 4100
+    """テスト用(IPとポート番号)
+    #ip="192.168.8.55"
+    #port=1357
+    """
+    #本番用(IPとポート番号)
+    ip = "192.168.16.99"
+    port = 4100
 
     while True:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 新しいソケットを作成
@@ -68,11 +70,12 @@ def main():
         while True:
             one_minutes_timer()  # 1分間計測
             try:
-                #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D010)
-                #D010のレジスタに任意の値が格納されているかを、D010の値を読み出して確認
-                #client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000010001")) 
+                #レジスタ読み出し要求(PLCのレジスタはどこを指定するか？→D001)
+                #D001のレジスタに任意の値が格納されているかを、D001の値を読み出して確認
+                client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000010001")) 
                 #if  client_socket.sendall(bytes(b"500000FF03FF000018002004010000D*0000010001")) :
-                client_socket.sendall(b"D202") 
+                #テスト用
+                #client_socket.sendall(b"D202") 
                 response = str(client_socket.recv(1024).decode())
                 msg,is_operational = data(response) 
                 timestamp: datetime = datetime.now(pytz.timezone('Asia/Tokyo'))  
